@@ -1,9 +1,9 @@
 package alit;
 
-import sml.Agent;
-import sml.Identifier;
-import sml.Kernel;
-import sml.smlUpdateEventId;
+import sml.*;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * User: Alexander Litvinenko
@@ -12,47 +12,72 @@ import sml.smlUpdateEventId;
  */
 public class Proba {
 
-    private static final String PATH = "helloworld.soar";
+        private static final String PATH = "sudoku.soar";
+//    private static final String PATH = "helloworld.soar";
     private Kernel kernel;
     private Agent agent;
 
-    public Proba()
-    {
+    public Proba() {
+        int[] constraints = new int[]{1, 2, 3};
         System.out.println("Creating kernel...");
         kernel = Kernel.CreateKernelInNewThread();
         System.out.println("Creating agent..");
         agent = kernel.CreateAgent("soar");
         System.out.println("Loading productions...");
-        agent.LoadProductions(PATH);
+        boolean b = agent.LoadProductions(PATH);
+
         System.out.println("Creating input link...");
+//        for(int constraint : constraints) {
+//            agent.GetInputLink().CreateIntWME("constraint", constraint);
+        agent.GetInputLink().CreateIntWME("constraint", 1);
+//        }
         agent.GetInputLink().CreateStringWME("hello", "world");
         System.out.println("Registering for update event...");
-        kernel.RegisterForUpdateEvent(
-                smlUpdateEventId.smlEVENT_AFTER_ALL_OUTPUT_PHASES,
-                new Kernel.UpdateEventInterface()
-                {
-                    public void updateEventHandler(int eventID, Object data,
-                            Kernel kernel, int runFlags)
-                    {
-                        System.out.println("Update event...");
+        agent.Commit();
+        agent.RunSelfTilOutput();
+//        System.out.println("----------------: " + agent.GetOutputLink().GetChild(0).GetValueAsString());
+        for (int index = 0; index < agent.GetNumberCommands(); ++index) {
+            Identifier command = agent.GetCommand(index);
 
-                        for (int index = 0; index < agent.GetNumberCommands(); ++index)
-                        {
-                            Identifier command = agent.GetCommand(index);
+            String name = command.GetCommandName();
 
-                            String name = command.GetCommandName();
-
-                            System.out.println("Received command: " + name);
-                            kernel.StopAllAgents();
-                            command.AddStatusComplete();
-                        }
+            System.out.println("Received command: " + name);
+            kernel.StopAllAgents();
+            command.AddStatusComplete();
+        }
 
 
-                        agent.ClearOutputLinkChanges();
+        agent.ClearOutputLinkChanges();
 
-                        System.out.println("Update event complete.");
-                    }
-                }, null);
+        System.out.println("Update event complete.");
+
+
+//        kernel.RegisterForUpdateEvent(
+//                smlUpdateEventId.smlEVENT_AFTER_ALL_OUTPUT_PHASES,
+//                new Kernel.UpdateEventInterface()
+//                {
+//                    public void updateEventHandler(int eventID, Object data,
+//                            Kernel kernel, int runFlags)
+//                    {
+//                        System.out.println("Update event...");
+//
+//                        for (int index = 0; index < agent.GetNumberCommands(); ++index)
+//                        {
+//                            Identifier command = agent.GetCommand(index);
+//
+//                            String name = command.GetCommandName();
+//
+//                            System.out.println("Received command: " + name);
+//                            kernel.StopAllAgents();
+//                            command.AddStatusComplete();
+//                        }
+//
+//
+//                        agent.ClearOutputLinkChanges();
+//
+//                        System.out.println("Update event complete.");
+//                    }
+//                }, null);
         System.out.println("Running agents...");
         kernel.RunAllAgents(5);
         System.out.println("Shutting down...");

@@ -12,7 +12,8 @@ sp {propose*stop
 # a command with no parameters.
 sp {apply*stop
     (state <s> ^operator.name stop 
-               ^io.output-link <ol>)
+               ^io.output-link <ol>
+               ^io.input-link.hello <h>)
 -->
-    (<ol> ^stop <stop> ^play <play>)
+    (<ol> ^stop <stop> ^play <h>)
 }
