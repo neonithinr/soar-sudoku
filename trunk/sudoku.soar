@@ -1,3 +1,12 @@
-sp {
-
+sp {propose*stop
+    (state <s> ^io.input-link.hello world)
+-->
+    (<s> ^operator <o> +)
+    (<o> ^name stop)
+}
+sp {apply*stop
+    (state <s> ^operator.name stop
+               ^io.output-link <ol>)
+-->
+    (<ol> ^stop <stop> ^play <play>)
 }

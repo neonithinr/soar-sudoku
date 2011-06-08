@@ -1,0 +1,32 @@
+sp {propose*initialize-sudoku
+   (state <s> ^superstate nil
+             -^name)
+-->
+   (<s> ^operator <o> +)
+   (<o> ^name initialize-sudoku)
+}
+
+sp {apply*initialize-sudoku
+   (state <s> ^operator <op>)
+   (<op> ^name initialize-sudoku)
+-->
+   (<s> ^name sudoku
+        ^input-link <il>
+        ^otput-link <ol>
+        ^digits <ds>)
+   (<il> ^constraint 1
+         ^constraint 5
+         ^constraint 6)
+   (<ds> ^digit -1
+         ^digit 0
+         ^digit 1
+         ^digit 2
+         ^digit 3
+         ^digit 4
+         ^digit 5
+         ^digit 6
+         ^digit 7
+         ^digit 8
+         ^digit 9)
+}
+

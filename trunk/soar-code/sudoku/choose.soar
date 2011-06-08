@@ -1,0 +1,23 @@
+sp {sudoku*propose*choose
+   (state <s> ^name sudoku
+              ^input-link <il>
+              ^digits <ds>)
+   (<il> ^constraint <c>)
+   (<ds> ^digit {<d> <> <c>})
+-->
+   (<s> ^operator <op> + =)
+   (<op> ^name choose
+         ^choice <d>)
+}
+sp {apply*choose
+   (state <s> ^operator <op>
+              ^output-link <ol>
+                           )
+   (<op> ^name choose
+         ^choice <c>
+                 )
+-->
+   (<ol> ^choice <c>)
+   (write (crlf) <c> | The problem has been solved.|)
+   (halt)
+}
