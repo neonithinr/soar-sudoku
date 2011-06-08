@@ -2,12 +2,12 @@ sp {sudoku*propose*choose
    (state <s> ^name sudoku
               ^input-link <il>
               ^digits <ds>)
-   (<il> ^constraint <c>)
-   (<ds> ^digit {<d> <> <c>})
+   (<ds> ^digit <d>)
 -->
    (<s> ^operator <op> + =)
    (<op> ^name choose
          ^choice <d>)
+   #(write (crlf)|propose |<d>)
 }
 sp {apply*choose
    (state <s> ^operator <op>
