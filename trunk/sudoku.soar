@@ -13,7 +13,6 @@ sp {apply*initialize-sudoku
    (<s> ^name sudoku
         ^digits <ds>)
    (<ds> ^digit -1
-         ^digit 0
          ^digit 1
          ^digit 2
          ^digit 3
