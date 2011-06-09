@@ -1,9 +1,12 @@
 package alit;
 
+import alit.exceptions.SudokuException;
 import sml.*;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.prefs.Preferences;
 
 /**
  * User: Alexander Litvinenko
@@ -12,84 +15,61 @@ import java.util.Set;
  */
 public class Proba {
 
-        private static final String PATH = "sudoku.soar";
+    private static final String PATH = "sudoku.soar";
 //    private static final String PATH = "helloworld.soar";
-    private Kernel kernel;
-    private Agent agent;
 
-    public Proba() {
-        int[] constraints = new int[]{1, 2, 3};
-        System.out.println("Creating kernel...");
-        kernel = Kernel.CreateKernelInNewThread();
-        System.out.println("Creating agent..");
-        agent = kernel.CreateAgent("soar");
-        System.out.println("Loading productions...");
-        boolean b = agent.LoadProductions(PATH);
 
-        System.out.println("Creating input link...");
-//        for(int constraint : constraints) {
-//            agent.GetInputLink().CreateIntWME("constraint", constraint);
-        agent.GetInputLink().CreateIntWME("constraint", 1);
-//        }
-        agent.GetInputLink().CreateStringWME("hello", "world");
-        System.out.println("Registering for update event...");
-        agent.Commit();
-        agent.RunSelfTilOutput();
-//        System.out.println("----------------: " + agent.GetOutputLink().GetChild(0).GetValueAsString());
-        for (int index = 0; index < agent.GetNumberCommands(); ++index) {
-            Identifier command = agent.GetCommand(index);
+    public Proba() throws SudokuException {
 
-            String name = command.GetCommandName();
+    }
 
-            System.out.println("Received command: " + name);
-            kernel.StopAllAgents();
-            command.AddStatusComplete();
+    public int makeChoice(int[] constraints) throws SudokuException {
+        int choice = -2;
+
+        Kernel kernel = Kernel.CreateKernelInNewThread();
+        if (kernel.HadError())
+            throw new SudokuException(kernel.GetLastErrorDescription());
+
+        Agent agent = kernel.CreateAgent("soar");
+        if (agent.HadError())
+            throw new SudokuException(agent.GetLastErrorDescription());
+
+        boolean status = agent.LoadProductions(PATH);
+        if (!status)
+            throw new SudokuException(agent.GetLastErrorDescription());
+
+        for (int constraint : constraints) {
+            agent.GetInputLink().CreateIntWME("constraint", constraint);
         }
 
+        agent.Commit();
+        agent.RunSelfTilOutput();
 
-        agent.ClearOutputLinkChanges();
+        Identifier ol = agent.GetOutputLink();
+        if (ol == null)
+            throw new SudokuException("There is no output-link!");
 
-        System.out.println("Update event complete.");
+        try {
+            choice = Integer.parseInt(ol.GetChild(0).GetValueAsString());
+            agent.ClearOutputLinkChanges();
+        } catch (NumberFormatException nfe) {
+            throw new SudokuException(nfe);
+        } catch (NullPointerException npe) {
+            throw new SudokuException(npe);
+        } finally {
+            kernel.DestroyAgent(agent);
+            kernel.Shutdown();
+        }
 
-
-//        kernel.RegisterForUpdateEvent(
-//                smlUpdateEventId.smlEVENT_AFTER_ALL_OUTPUT_PHASES,
-//                new Kernel.UpdateEventInterface()
-//                {
-//                    public void updateEventHandler(int eventID, Object data,
-//                            Kernel kernel, int runFlags)
-//                    {
-//                        System.out.println("Update event...");
-//
-//                        for (int index = 0; index < agent.GetNumberCommands(); ++index)
-//                        {
-//                            Identifier command = agent.GetCommand(index);
-//
-//                            String name = command.GetCommandName();
-//
-//                            System.out.println("Received command: " + name);
-//                            kernel.StopAllAgents();
-//                            command.AddStatusComplete();
-//                        }
-//
-//
-//                        agent.ClearOutputLinkChanges();
-//
-//                        System.out.println("Update event complete.");
-//                    }
-//                }, null);
-        System.out.println("Running agents...");
-        kernel.RunAllAgents(5);
-        System.out.println("Shutting down...");
-        kernel.DestroyAgent(agent);
-        agent = null;
-        kernel.Shutdown();
-        kernel = null;
-
-        System.out.println("Done.");
+        return choice;
     }
 
     public static void main(String[] args) {
-        new Proba();
+        try {
+            Proba p = new Proba();
+            System.out.println(p.makeChoice(new int[]{0, 1, 2, 3, 4, 5, 6, 7, 8}));
+        } catch (SudokuException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
     }
 }

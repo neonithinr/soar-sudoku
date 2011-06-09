@@ -45,7 +45,6 @@ sp {apply*choose
 -->
    (<ol> ^choice <c>)
    (write (crlf) <c> | The problem has been solved.|)
-   (halt)
 }
 sp {prohibit
    (state <s> ^name sudoku
