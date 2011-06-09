@@ -1,8 +1,13 @@
 package alit;
 
 import alit.exceptions.SudokuException;
+import alit.sudoku.Sudoku;
 import sml.*;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -71,5 +76,15 @@ public class Proba {
         } catch (SudokuException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
+        try {
+            Sudoku s = new Sudoku(new BufferedReader(new FileReader("proba.txt")));
+            System.out.println(s);
+        } catch (SudokuException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+
+
     }
 }
