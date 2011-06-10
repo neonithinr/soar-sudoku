@@ -18,9 +18,11 @@ import java.util.*;
 public class Sudoku {
 
     private static final String PATH = "sudoku.soar";
+    private static final int INSERTION = 0;
 
     private int n = 9;
     private int[][] sudoku = new int[n][n];
+    private Stack<Point> places = null;
 
     public Sudoku(BufferedReader reader) throws SudokuException {
         try {
@@ -35,26 +37,25 @@ public class Sudoku {
         } catch (NumberFormatException nfe) {
             throw new SudokuException("Cannot convert!", nfe);
         }
+        places = getInsertionPlaces();
     }
 
     public void solve() throws SudokuException {
         Stack<Point> steps = new Stack<Point>();
         Stack<Point> insertionPlaces = getInsertionPlaces();
-        //TODO: Replace "for"  with steps
         //TODO: Add history
 
         while (!insertionPlaces.isEmpty()) {
-            System.out.println(this);
             Point place = insertionPlaces.pop();
+            steps.push(place);
             Iterable<Integer> constraints = findConstraints(place);
             int insertion = makeChoice(constraints);
-            if (insertion == -1) {
+            if (insertion == INSERTION) {
                 Point back = steps.pop();
-                sudoku[back.x][back.y] = -1;
+                sudoku[back.x][back.y] = INSERTION;
                 insertionPlaces.push(back);
             } else {
                 sudoku[place.x][place.y] = insertion;
-                steps.push(place);
             }
         }
 
@@ -64,7 +65,7 @@ public class Sudoku {
         Stack<Point> stack = new Stack<Point>();
         for (int i = 0; i < getSize(); i++) {
             for (int j = 0; j < getSize(); j++) {
-                if (sudoku[i][j] == -1) {
+                if (sudoku[i][j] == INSERTION) {
                     stack.add(new Point(i, j));
                 }
             }
@@ -118,14 +119,14 @@ public class Sudoku {
 
         // Horizontal constraints
         for (int j = 0; j < getSize(); j++) {
-            if (sudoku[p.x][j] != -1) {
+            if (sudoku[p.x][j] != INSERTION) {
                 constraints.add(sudoku[p.x][j]);
             }
         }
 
         // Vertical constraints
         for (int i = 1; i < getSize(); i++) {
-            if (sudoku[i][p.y] != -1) {
+            if (sudoku[i][p.y] != INSERTION) {
                 constraints.add(sudoku[i][p.y]);
             }
         }
@@ -136,7 +137,7 @@ public class Sudoku {
         do {
             int j = bJ;
             do {
-                if (sudoku[i][j] != -1) {
+                if (sudoku[i][j] != INSERTION) {
                     constraints.add(sudoku[i][j]);
                 }
                 j++;
@@ -154,20 +155,23 @@ public class Sudoku {
     }
 
     public String toString() {
-        StringBuilder builder = new StringBuilder("+-------+-------+-------+\n");
+        StringBuilder builder = new StringBuilder("+-------------+-------------+-------------+\n");
         for (int i = 0; i < getSize(); i++) {
             builder.append("| ");
             for (int j = 0; j < getSize(); j++) {
-                if (sudoku[i][j] != -1)
-                    builder.append(sudoku[i][j]).append(" ");
+                if (sudoku[i][j] != INSERTION)
+                    if(places.contains(new Point(i, j)))
+                        builder.append("[").append(sudoku[i][j]).append("] ");
+                    else
+                        builder.append(" ").append(sudoku[i][j]).append("  ");
                 else
-                    builder.append("_").append(" ");
+                    builder.append("[_]").append(" ");
                 if ((j + 1) % 3 == 0)
                     builder.append("| ");
             }
             builder.deleteCharAt(builder.length() - 1).append("\n");
             if ((i + 1) % 3 == 0)
-                builder.append("+-------+-------+-------+\n");
+                builder.append("+-------------+-------------+-------------+\n");
         }
         return builder.toString();
     }
