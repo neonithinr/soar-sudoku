@@ -1,6 +1,7 @@
 package alit;
 
 import alit.exceptions.SudokuException;
+import alit.sudoku.Point;
 import alit.sudoku.Sudoku;
 import sml.*;
 
@@ -78,6 +79,12 @@ public class Proba {
         }
         try {
             Sudoku s = new Sudoku(new BufferedReader(new FileReader("proba.txt")));
+//            Point p = new Point(3, 5);
+//            for (int i : s.findConstraints(p))
+//                System.out.print(i + " ");
+//            System.out.println();
+            System.out.println(s);
+            s.solve();
             System.out.println(s);
         } catch (SudokuException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
