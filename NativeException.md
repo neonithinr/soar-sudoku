@@ -1,0 +1,1 @@
+Add %SoarDir%\bin to %Path%
